@@ -14,7 +14,7 @@ class Pong
 		@gamePaddle = new createjs.Rectangle(20, 0, 30, 180)
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
-		@initialBallSpeed = 0.5
+		@initialBallSpeed = 5
 		# Create scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
 		@scrollUpImage = new Image()
@@ -42,6 +42,8 @@ class Pong
 		# Show tooltip
 		$("img.start").fadeIn()
 		$(".score").fadeOut()
+		# Reset score
+		@_setScore(0)
 		# Reset scroll
 		@scrollKnob.y = KNOB_MARGIN_TOP
 		# Reset ball position and direction
@@ -51,6 +53,7 @@ class Pong
 		@ball.speed = @initialBallSpeed
 	stop: ->
 		console.log "stop"
+		@started = false
 	tick: ->
 		# Fade all elements
 		@ctx.fillStyle = "rgba(255, 255, 255, 0.4)"
@@ -66,12 +69,12 @@ class Pong
 		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
 		# Scroll bar
 		@ctx.fillStyle = "#eeeeee"
-		@ctx.fillRect(@canvas.width - SCROLL_WIDTH, 0, SCROLL_WIDTH, @canvas.height)
+		@ctx.fillRect(@scrollKnob.x, 0, @scrollKnob.width, @canvas.height)
 		@ctx.fillStyle = "#c0c0c0"
-		@ctx.fillRect(@canvas.width - SCROLL_WIDTH + 2, @scrollKnob.y + 2, SCROLL_WIDTH - 2, @scrollKnob.height)
+		@ctx.fillRect(@scrollKnob.x + 2, @scrollKnob.y + 2, @scrollKnob.width - 2, @scrollKnob.height)
 		@ctx.lineWidth = 1
 		@ctx.strokeStyle = "#808080"
-		@ctx.strokeRect(@canvas.width - SCROLL_WIDTH + 0.5, @scrollKnob.y + 0.5, SCROLL_WIDTH - 1, @scrollKnob.height)
+		@ctx.strokeRect(@scrollKnob.x + 0.5, @scrollKnob.y + 0.5, @scrollKnob.width - 1, @scrollKnob.height)
 		# Top and bottom buttons
 		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
 		@ctx.drawImage(@scrollDownImage, @canvas.width - SCROLL_WIDTH, @canvas.height - KNOB_MARGIN_BOTTOM)
@@ -84,15 +87,43 @@ class Pong
 		@scrollKnob.height = size
 	# Private
 	_updateGame: ->
-		@ball.x += @ball.speed * Math.cos(@ball.angle)
-		@ball.y += @ball.speed * Math.sin(@ball.angle)
-		# @gamePaddle.y = (1+Math.sin((time - startTime)*0.001))/2 * (@canvas.height-@gamePaddle.height)
-		# @ball.x = (1+Math.cos((time - startTime)*0.0005))/2 * @canvas.width
-		# @ball.y = @canvas.height / 2
+		# Calculate next ball position
+		nextBall = @ball.clone()
+		nextBall.x = @ball.x + @ball.speed * Math.cos(@ball.angle)
+		nextBall.y = @ball.y + @ball.speed * Math.sin(@ball.angle)
 
+		# 
+		# Check what to do!
+		# 
+
+		# Computer missed, user scored
+		if nextBall.x < 0
+			@_setScore(@score + 1)
+			# TODO restart
+		# User lost
+		else if nextBall.x > @canvas.width - @ball.width
+			@stop()
+
+		# Paddle Collision
+		if nextBall.overlapsRect(@gamePaddle)
+			@ball.angle += Math.PI
+		else if nextBall.overlapsRect(@scrollKnob)
+			@ball.angle += Math.PI
+		# Wall Collision
+		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
+			@ball.angle += Math.PI
+			# @_updateGame()
+		else
+			nextBall.angle = @ball.angle
+			nextBall.speed = @ball.speed
+			@ball = nextBall
+	_setScore: (score)->
+		@score = score
+		$(".score .num").text(score)
 	_resize: (e)->
-		@canvas.width = window.innerWidth;
-		@canvas.height = window.innerHeight;
+		@canvas.width = window.innerWidth
+		@canvas.height = window.innerHeight
+		@scrollKnob.x = @canvas.width - SCROLL_WIDTH
 	_scroll: (e)->
 		# Check if we're starting the game
 		if not @started
@@ -110,4 +141,6 @@ class Pong
 # Export
 window.Pong = Pong
 
-
+createjs.Rectangle.prototype.overlapsRect = (r)->
+	# http://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other =)
+	(@x < r.x + r.width && @x + @width > r.x && @y < r.y + r.height && @y + @height > r.y)
