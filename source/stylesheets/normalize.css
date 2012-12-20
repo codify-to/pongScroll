@@ -4,6 +4,14 @@
    HTML5 display definitions
    ========================================================================== */
 
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
 /*
  * Corrects `block` display not defined in IE 8/9.
  */

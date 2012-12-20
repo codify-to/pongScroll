@@ -10,10 +10,31 @@
     <title><%= data.page.title || "The Middleman" %></title>
     
     <%= stylesheet_link_tag "normalize", "all" %>
-    <%= javascript_include_tag  "all" %>
+    <script src="http://code.createjs.com/easeljs-0.5.0.min.js"></script>
+    <script src="http://code.createjs.com/preloadjs-0.2.0.min.js"></script>
   </head>
   
   <body class="<%= page_classes %>">
+
+    <!-- Facebook sdk initialization -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=417534211653100";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
     <%= yield %>
+
+    <!-- Place this tag after the last +1 button tag. -->
+    <script type="text/javascript">
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+    </script>
   </body>
+  <%= javascript_include_tag  "all" %>
 </html>

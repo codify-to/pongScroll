@@ -1,0 +1,28 @@
+// Footer with like buttons
+footer{
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	padding: 0 40px 15px 20px;
+	width: 100%;
+	font-size: 8px;
+	font-family: "pixelmixregular";
+
+	p {
+		float: left;
+		margin-top: 50px;
+	}
+	.and {
+		color: #1bc1ff;
+	}
+
+	.plus{
+		float: right;
+		text-align: baseline;
+	}
+	.fb-like{
+		float: right;
+		margin-left: 10px;
+		text-align: baseline;
+	}
+}
