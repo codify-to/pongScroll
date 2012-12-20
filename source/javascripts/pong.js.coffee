@@ -60,5 +60,4 @@ class Pong
 # Export
 window.Pong = Pong
 
-terminal = new Terminal()
-terminal.printMenu()
+

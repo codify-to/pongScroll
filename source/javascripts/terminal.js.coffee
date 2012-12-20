@@ -1,11 +1,29 @@
 class Terminal
   constructor: () ->
+    #Prevent errors and warning from outputing on console
+    #window.onerror = () -> true
+    setInterval(@.checkVariables,500)
+
+  checkVariables: () ->
+    if(window.ballSpeed)
+      console.log("Setou a velocidade!")
+      window.ballSpeed = null
+    if(window.ballColor)
+      console.log("Setou a cor!")
+      window.ballColor = null
+    if(window.paddleSize)
+      console.log("Setou o paddle!")
+      window.paddleSize = null
+
+  printMessage: (str) ->
+    # todo
+
     
 
   printMenu: () ->
     console.log "┏████████████████████████████████████████████████████████████████████┓\n
 ┃                                                                    ┃\n
-┃                           [ MAIN MENU ]                            ┃\n
+┃                 [ PONG DEVELOPERS TERMINAL ACCESS ]                ┃\n
 ┃                                                                    ┃\n
 ┃                      TYPE COMMAND TO EXECUTE:                      ┃\n
 ┃                                                                    ┃\n
