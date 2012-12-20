@@ -76,7 +76,7 @@ class Pong
 		console.log "set speed to #{s}"
 	setPaddleSize: (size)->
 		# Save size
-		@scrollKnob.height = 180
+		@scrollKnob.height = size
 	# Private
 	_resize: (e)->
 		@canvas.width = window.innerWidth;
