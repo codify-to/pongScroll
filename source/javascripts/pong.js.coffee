@@ -1,6 +1,7 @@
 SCROLL_WIDTH = 18
 KNOB_MARGIN_TOP = 18
 KNOB_MARGIN_BOTTOM = 18
+ANGLE_VARIATION = Math.PI / 4
 
 class Pong
 	ballColor: "#1bc1ff"
@@ -48,7 +49,6 @@ class Pong
 		@_newUserRound()
 		
 	stop: ->
-		console.log "stop"
 		@started = false
 	tick: ->
 		# Fade all elements
@@ -104,13 +104,18 @@ class Pong
 
 		# Paddle Collision
 		if nextBall.overlapsRect(@gamePaddle)
-			@ball.angle += Math.PI
+			a = @ball.height/2 + (@ball.y - @gamePaddle.y)
+			a = (a / @gamePaddle.height)*2 - 1
+			a = a * ANGLE_VARIATION
+			@ball.angle = a
 		else if nextBall.overlapsRect(@scrollKnob)
-			@ball.angle += Math.PI
+			a = @ball.height/2 + (@ball.y - @scrollKnob.y)
+			a = (a / @scrollKnob.height)*2 - 1
+			a = Math.PI - (a * ANGLE_VARIATION)
+			@ball.angle = a
 		# Wall Collision
 		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
-			@ball.angle += Math.PI
-			# @_updateGame()
+			@ball.angle *= -1 #Math.PI - @ball.angle
 		else
 			nextBall.angle = @ball.angle
 			nextBall.speed = @ball.speed
