@@ -46,35 +46,34 @@ class Terminal
 
   printMessage: (str) ->
     window.clear()
-    output = "┏████████████████████████████████████████████████████████████████████┓\n
-┃                                                                    ┃\n┃"
-    spaces = 62 - str.length
+    output = "┏██████████████████████████████████████████████████████████████┓\n
+┃                                                              ┃\n┃"
+    spaces = 56 - str.length
     output += " " for x in [0..spaces/2]
     output += "[ #{str} ]"
     output += " " for x in [0..spaces/2+spaces%2]
     output += "┃\n
-┃                                                                    ┃\n
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+┃                                                              ┃\n
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
     console.log output
 
   printMenu: () ->
-    console.log "┏████████████████████████████████████████████████████████████████████┓\n
-┃                                                                    ┃\n
-┃                 [ PONG DEVELOPERS TERMINAL ACCESS ]                ┃\n
-┃                                                                    ┃\n
-┃                      TYPE COMMAND TO EXECUTE:                      ┃\n
-┃                                                                    ┃\n
-┃                                                                    ┃\n
-┃         ‣ ballSpeed = number                                       ┃\n
-┃               (changes the ball speed, varies between 0-1,         ┃\n
-┃                defaults to 0.5)                                    ┃\n
-┃         ‣ ballColor = string                                       ┃\n
-┃               (changes the ball color, defaults to \"#1bc1ff\")      ┃\n
-┃         ‣ paddleSize = number                                      ┃\n
-┃               (changes the player's paddle size)                   ┃\n
-┃         ‣ haduken()                                                ┃\n
-┃               (Why don't you try it out?)                          ┃\n
-┃                                                                    ┃\n
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    console.log "┏██████████████████████████████████████████████████████████████┓\n
+┃                                                              ┃\n
+┃              [ PONG DEVELOPERS TERMINAL ACCESS ]             ┃\n
+┃                                                              ┃\n
+┃                   TYPE COMMAND TO EXECUTE:                   ┃\n
+┃                                                              ┃\n
+┃                                                              ┃\n
+┃     ‣ ballSpeed = number                                     ┃\n
+┃           (changes the ball speed, defaults to 0.5)          ┃\n
+┃     ‣ ballColor = string                                     ┃\n
+┃           (changes the ball color, defaults to \"#1bc1ff\")    ┃\n
+┃     ‣ paddleSize = number                                    ┃\n
+┃           (changes the player's paddle size)                 ┃\n
+┃     ‣ haduken()                                              ┃\n
+┃           (Why don't you try it out?)                        ┃\n
+┃                                                              ┃\n
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 window.Terminal = Terminal
