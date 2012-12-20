@@ -1,8 +1,8 @@
 startTime = new Date
 
-SCROLL_WIDTH = 20
-KNOB_MARGIN_TOP = 40
-KNOB_MARGIN_BOTTOM = 40
+SCROLL_WIDTH = 18
+KNOB_MARGIN_TOP = 18
+KNOB_MARGIN_BOTTOM = 18
 
 class Pong
 	ballColor: "#1bc1ff"
@@ -18,6 +18,10 @@ class Pong
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
 		# Create scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 180)
+		@scrollUpImage = new Image()
+		@scrollUpImage.src = "images/scrollUp.jpg"
+		@scrollDownImage = new Image()
+		@scrollDownImage.src = "images/scrollDown.jpg"
 		
 		# Creating the scrollbar
 
@@ -58,7 +62,13 @@ class Pong
 		@ctx.fillStyle = "#eeeeee"
 		@ctx.fillRect(@canvas.width - SCROLL_WIDTH, 0, SCROLL_WIDTH, @canvas.height)
 		@ctx.fillStyle = "#c0c0c0"
-		@ctx.fillRect(@canvas.width - SCROLL_WIDTH, @scrollKnob.y, SCROLL_WIDTH, @scrollKnob.height)
+		@ctx.fillRect(@canvas.width - SCROLL_WIDTH + 2, @scrollKnob.y + 2, SCROLL_WIDTH - 2, @scrollKnob.height)
+		@ctx.lineWidth = 1
+		@ctx.strokeStyle = "#808080"
+		@ctx.strokeRect(@canvas.width - SCROLL_WIDTH + 0.5, @scrollKnob.y + 0.5, SCROLL_WIDTH - 1, @scrollKnob.height)
+		# Top and bottom buttons
+		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
+		@ctx.drawImage(@scrollDownImage, @canvas.width - SCROLL_WIDTH, @canvas.height - KNOB_MARGIN_BOTTOM)
 
 	# Commandline interface
 	setSpeed: (s)->
@@ -66,7 +76,7 @@ class Pong
 		console.log "set speed to #{s}"
 	setPaddleSize: (size)->
 		# Save size
-		@scrollKnob.height = 180
+		@scrollKnob.height = size
 	# Private
 	_resize: (e)->
 		@canvas.width = window.innerWidth;
