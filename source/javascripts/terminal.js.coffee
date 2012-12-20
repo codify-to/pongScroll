@@ -2,23 +2,53 @@ class Terminal
   constructor: () ->
     #Prevent errors and warning from outputing on console
     #window.onerror = () -> true
-    setInterval(@.checkVariables,500)
+
+    if (console._commandLineAPI?)
+      window.clear = console._commandLineAPI.clear
+    else if (console._inspectorCommandLineAPI?)
+      window.clear = console._inspectorCommandLineAPI.clear
+    else if (_FirebugCommandLine?)
+      window.clear = _FirebugCommandLine.clear
+    else
+      window.clear = ()-> console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+
+    setInterval =>
+      @checkVariables()
+    ,500
 
   checkVariables: () ->
     if(window.ballSpeed)
-      console.log("Setou a velocidade!")
+      @printMessage("Você setou a velocidade para #{window.ballSpeed}")
       window.ballSpeed = null
+      setTimeout  =>
+        @printMenu()
+      , 1000
+      
     if(window.ballColor)
-      console.log("Setou a cor!")
+      @printMessage("Você setou a cor para #{window.ballColor}")
       window.ballColor = null
+      setTimeout  =>
+        @printMenu()
+      , 1000
     if(window.paddleSize)
-      console.log("Setou o paddle!")
+      @printMessage("Você setou o tamanho do paddle para #{window.paddleSize}")
       window.paddleSize = null
+      setTimeout  =>
+        @printMenu()
+      , 1000
 
   printMessage: (str) ->
-    # todo
-
-    
+    window.clear()
+    output = "┏████████████████████████████████████████████████████████████████████┓\n
+┃                                                                    ┃\n┃"
+    spaces = 62 - str.length
+    output += " " for x in [0..spaces/2]
+    output += "[ #{str} ]"
+    output += " " for x in [0..spaces/2+spaces%2]
+    output += "┃\n
+┃                                                                    ┃\n
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    console.log output
 
   printMenu: () ->
     console.log "┏████████████████████████████████████████████████████████████████████┓\n
