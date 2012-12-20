@@ -1,6 +1,6 @@
 game = new Pong();
 
-# game.start()
+game.start()
 # game.stop()
 
 # game.setSpeed()
