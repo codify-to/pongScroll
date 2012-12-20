@@ -2,6 +2,9 @@ SCROLL_WIDTH = 18
 KNOB_MARGIN_TOP = 18
 KNOB_MARGIN_BOTTOM = 18
 ANGLE_VARIATION = Math.PI / 4
+TRAIL = 0.5
+
+PADDLE_SPEED = 15
 
 class Pong
 	ballColor: "#1bc1ff"
@@ -15,7 +18,7 @@ class Pong
 		@gamePaddle = new createjs.Rectangle(20, 0, 30, 180)
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
-		@initialBallSpeed = 15
+		@initialBallSpeed = 20
 		# Create scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
 		@scrollUpImage = new Image()
@@ -52,7 +55,7 @@ class Pong
 		@started = false
 	tick: ->
 		# Fade all elements
-		@ctx.fillStyle = "rgba(255, 255, 255, 0.4)"
+		@ctx.fillStyle = "rgba(255, 255, 255, #{TRAIL})"
 		@ctx.fillRect(0, 0, @canvas.width, @canvas.height)
 
 		# Update positions if we're playing
@@ -83,43 +86,62 @@ class Pong
 		@scrollKnob.height = size
 	# Private
 	_updateGame: ->
+
+		# Check if it's time to follow the ball
+		if @ball.x < @canvas.width/2
+			# 
+			# Move computer's paddle
+			paddleMiddle = @gamePaddle.y + @gamePaddle.height/2
+			paddleTh = @gamePaddle.height/2
+			if paddleMiddle - paddleTh > @ball.y + @ball.height/2
+				@gamePaddle.y -= PADDLE_SPEED
+			else if paddleMiddle + paddleTh < @ball.y + @ball.height/2
+				@gamePaddle.y += PADDLE_SPEED
+			
+			@gamePaddle.y = 0 if @gamePaddle.y < 0
+			@gamePaddle.y = @canvas.height - @gamePaddle.height if @gamePaddle.y > @canvas.height - @gamePaddle.height
+		
+
 		# Calculate next ball position
 		nextBall = @ball.clone()
 		nextBall.x = @ball.x + @ball.speed * Math.cos(@ball.angle)
 		nextBall.y = @ball.y + @ball.speed * Math.sin(@ball.angle)
 
-		# 
-		# Check what to do!
-		# 
+		ballP1 = {X: @ball.x, Y: @ball.y + @ball.height/2}
+		ballP2 = {X: nextBall.x, Y: nextBall.y + nextBall.height/2}
+
+		# Paddle Collision
+		if lineIntersectsLine(ballP1, ballP2, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y}, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y+@gamePaddle.height})
+			a = @ball.height/2 + (@ball.y - @gamePaddle.y)
+			a = (a / @gamePaddle.height)*2 - 1
+			a = a * ANGLE_VARIATION
+			@ball.angle = a
+			return
+		else if lineIntersectsLine(ballP1, ballP2, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y}, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y+@scrollKnob.height})
+			a = @ball.height/2 + (@ball.y - @scrollKnob.y)
+			a = (a / @scrollKnob.height)*2 - 1
+			a = Math.PI - (a * ANGLE_VARIATION)
+			@ball.angle = a
+			return
+		# Wall Collision
+		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
+			@ball.angle *= -1
+			return
+		else
+			nextBall.angle = @ball.angle
+			nextBall.speed = @ball.speed
+			@ball = nextBall
+
+		# Let's see now if someone scored
 
 		# Computer missed, user scored
 		if nextBall.x < 0
 			@_setScore(@score + 1)
 			@_newComputerRound()
-			return
 		# User lost
 		else if nextBall.x > @canvas.width - @ball.width
 			@_newUserRound()
-			return
 
-		# Paddle Collision
-		if nextBall.overlapsRect(@gamePaddle)
-			a = @ball.height/2 + (@ball.y - @gamePaddle.y)
-			a = (a / @gamePaddle.height)*2 - 1
-			a = a * ANGLE_VARIATION
-			@ball.angle = a
-		else if nextBall.overlapsRect(@scrollKnob)
-			a = @ball.height/2 + (@ball.y - @scrollKnob.y)
-			a = (a / @scrollKnob.height)*2 - 1
-			a = Math.PI - (a * ANGLE_VARIATION)
-			@ball.angle = a
-		# Wall Collision
-		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
-			@ball.angle *= -1 #Math.PI - @ball.angle
-		else
-			nextBall.angle = @ball.angle
-			nextBall.speed = @ball.speed
-			@ball = nextBall
 	_setScore: (score)->
 		@score = score
 		$(".score .num").text(score)
@@ -137,7 +159,7 @@ class Pong
 		$(".score").fadeOut()
 	_newComputerRound: ()->
 		# Set ball position
-		@ball.x = @gamePaddle.x + SCROLL_WIDTH + 5
+		@ball.x = @gamePaddle.x + @gamePaddle.width + 5
 		@ball.y = @gamePaddle.y + Math.random()*@gamePaddle.height
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
@@ -163,6 +185,17 @@ class Pong
 # Export
 window.Pong = Pong
 
-createjs.Rectangle.prototype.overlapsRect = (r)->
-	# http://stackoverflow.com/questions/306316/determine-if-two-rectangles-overlap-each-other =)
-	(@x < r.x + r.width && @x + @width > r.x && @y < r.y + r.height && @y + @height > r.y)
+lineIntersectsLine = (l1p1, l1p2, l2p1, l2p2) ->
+	q = (l1p1.Y - l2p1.Y) * (l2p2.X - l2p1.X) - (l1p1.X - l2p1.X) * (l2p2.Y - l2p1.Y)
+	d = (l1p2.X - l1p1.X) * (l2p2.Y - l2p1.Y) - (l1p2.Y - l1p1.Y) * (l2p2.X - l2p1.X)
+
+	if d == 0
+		return false
+
+	r = q / d
+	q = (l1p1.Y - l2p1.Y) * (l1p2.X - l1p1.X) - (l1p1.X - l2p1.X) * (l1p2.Y - l1p1.Y);
+	s = q / d;
+	if( r < 0 || r > 1 || s < 0 || s > 1 )
+		return false;
+
+	return true;
