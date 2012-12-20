@@ -1,6 +1,10 @@
 // header with logo and score
 header{
-	margin: 5px 40px 0 8px;
+	margin: 15px 40px 0 20px;
+
+	.logo {
+		margin: -3px -4px;
+	}
 
 	.score{
 		font-family: "pixelmixregular";
@@ -19,6 +23,18 @@ header{
 			text-transform: uppercase;
 		}
 	}
+}
+
+// Canvas
+#game {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	// Keep it behind the other elements
+	z-index: -1;
 }
 
 // Footer with like buttons
