@@ -24,7 +24,6 @@ class Pong
 		console.log "start"
 	stop: ->
 		console.log "stop"
-
 	tick: ->
 		# Fade all elements
 		@ctx.fillStyle = "rgba(255, 255, 255, 0.4)"
@@ -60,3 +59,6 @@ class Pong
 
 # Export
 window.Pong = Pong
+
+terminal = new Terminal()
+terminal.printMenu()
