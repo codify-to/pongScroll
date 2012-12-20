@@ -14,7 +14,7 @@ class Pong
 		@gamePaddle = new createjs.Rectangle(20, 0, 30, 180)
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
-		@initialBallSpeed = 5
+		@initialBallSpeed = 15
 		# Create scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
 		@scrollUpImage = new Image()
@@ -38,19 +38,15 @@ class Pong
 
 		# leftPaddle = new 
 	start: ->
-		@started = false
-		# Show tooltip
-		$("img.start").fadeIn()
-		$(".score").fadeOut()
 		# Reset score
 		@_setScore(0)
 		# Reset scroll
 		@scrollKnob.y = KNOB_MARGIN_TOP
-		# Reset ball position and direction
-		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
-		@ball.y = @scrollKnob.y + @scrollKnob.height/2
+		# Reset ball direction
 		@ball.angle = 0
-		@ball.speed = @initialBallSpeed
+
+		@_newUserRound()
+		
 	stop: ->
 		console.log "stop"
 		@started = false
@@ -99,10 +95,12 @@ class Pong
 		# Computer missed, user scored
 		if nextBall.x < 0
 			@_setScore(@score + 1)
-			# TODO restart
+			@_newComputerRound()
+			return
 		# User lost
 		else if nextBall.x > @canvas.width - @ball.width
-			@stop()
+			@_newUserRound()
+			return
 
 		# Paddle Collision
 		if nextBall.overlapsRect(@gamePaddle)
@@ -120,6 +118,25 @@ class Pong
 	_setScore: (score)->
 		@score = score
 		$(".score .num").text(score)
+	# Rounds
+	_newUserRound: ()->
+		# Set ball position
+		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
+		@ball.y = @scrollKnob.y + @scrollKnob.height/2
+		# Reset game speed
+		@ball.speed = @initialBallSpeed
+		# stop wintil user scrolls
+		@started = false
+		# Show tooltip
+		$("img.start").fadeIn()
+		$(".score").fadeOut()
+	_newComputerRound: ()->
+		# Set ball position
+		@ball.x = @gamePaddle.x + SCROLL_WIDTH + 5
+		@ball.y = @gamePaddle.y + Math.random()*@gamePaddle.height
+		# Reset game speed
+		@ball.speed = @initialBallSpeed
+	# Listeners
 	_resize: (e)->
 		@canvas.width = window.innerWidth
 		@canvas.height = window.innerHeight
