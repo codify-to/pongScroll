@@ -6,5 +6,4 @@ game.start()
 # game.setSpeed()
 # game.setPaddleSize(190)
 
-terminal = new Terminal()
-terminal.printMenu()
+terminal = new Terminal(game)
