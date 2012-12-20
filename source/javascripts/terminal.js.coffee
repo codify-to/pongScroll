@@ -1,5 +1,5 @@
 class Terminal
-  constructor: () ->
+  constructor: (@gameInstance) ->
     #Prevent errors and warning from outputing on console
     #window.onerror = () -> true
 
@@ -16,22 +16,29 @@ class Terminal
       @checkVariables()
     ,500
 
+    setTimeout  =>
+        @printMenu()
+    , 1000
+
   checkVariables: () ->
     if(window.ballSpeed)
       @printMessage("Você setou a velocidade para #{window.ballSpeed}")
-      window.ballSpeed = null
+      @gameInstance.setSpeed(window.ballSpeed)
+      window.ballSpeed = null #sets the global variable to null so we can keep checking it
       setTimeout  =>
         @printMenu()
       , 1000
       
     if(window.ballColor)
       @printMessage("Você setou a cor para #{window.ballColor}")
+      @gameInstance.ballColor = window.ballColor
       window.ballColor = null
       setTimeout  =>
         @printMenu()
       , 1000
     if(window.paddleSize)
       @printMessage("Você setou o tamanho do paddle para #{window.paddleSize}")
+      @gameInstance.setPaddleSize = window.paddleSize
       window.paddleSize = null
       setTimeout  =>
         @printMenu()
