@@ -7,3 +7,6 @@ console.log("alo")
 stage = new createjs.Stage(document.getElementById('game'))
 
 # leftPaddle = new 
+
+terminal = new Terminal()
+terminal.printMenu()
