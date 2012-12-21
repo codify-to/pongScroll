@@ -6,3 +6,4 @@ game.start()
 # game.setPaddleSize(190)
 
 terminal = new Terminal(game)
+window.hadouken = terminal.hadouken
