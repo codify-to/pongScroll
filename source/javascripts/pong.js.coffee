@@ -99,6 +99,20 @@ class Pong
 		# Save size
 		@scrollKnob.height = @gamePaddle.height = size
 
+	# Hadouken special
+	hadouken: ()->		
+		$(".hadoukenImg").remove()
+		for i in [0..5]
+			$("body").append("<img src='images/hadouken.gif' class='hadoukenImg' style='position:absolute; left:#{-100 - Math.random()* 800}px; top:#{Math.random()*@canvas.height}px;'>")
+		
+		$(".hadoukenImg").animate {left:@canvas.width + 800},2000;
+
+		interval = setInterval =>
+			@ballColor = "rgb(#{Math.floor Math.random()*255}, #{Math.floor Math.random()*255}, #{Math.floor Math.random()*255})"
+		, 50
+		setTimeout -> 
+			clearInterval(interval)
+		, 3000
 	# Private
 	_updateGame: ->
 
@@ -182,6 +196,8 @@ class Pong
 		# Top and bottom buttons
 		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
 		@ctx.drawImage(@scrollDownImage, @scrollDownRect.x, @scrollDownRect.y)
+			
+		
 
 	# Updates score and it's interface
 	_setScore: (score)->

@@ -83,7 +83,7 @@ footer{
 	left: 0px;
 	padding: 0 40px 15px 20px;
 	width: 100%;
-	font-size: 8px;
+	font-size: 14px;
 	font-family: "pixelmixregular";
 
 	img.credits {
@@ -92,6 +92,12 @@ footer{
 	}
 	.and {
 		color: #1bc1ff;
+	}
+
+	.message {
+		position: absolute;
+		left: 49%;
+		bottom: 20px;
 	}
 
 	.plus{
