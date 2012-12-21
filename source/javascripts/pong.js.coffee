@@ -66,7 +66,7 @@ class Pong
 
 		# Bind interaction events
 		# 
-		$(window).bind "mousewheel", (e)=>
+		$(window).bind "mousewheel DOMMouseScroll", (e)=>
 			@_scroll(e)
 		$(@canvas).bind "mousedown", (e)=>
 			@_mouseDown(e)
@@ -215,7 +215,7 @@ class Pong
 		@started = false
 
 		# Unbind interaction
-		$(window).unbind "mousewheel"
+		$(window).unbind "mousewheel DOMMouseScroll"
 		$(@canvas).unbind "mousedown"
 		$(@canvas).unbind "mouseup"
 
@@ -238,7 +238,7 @@ class Pong
 			@canvas.width - SCROLL_WIDTH
 		@scrollDownRect.y = @canvas.height - KNOB_MARGIN_BOTTOM
 	_scroll: (e)->
-		@_moveKnobY(@scrollKnob.y + e.originalEvent.wheelDelta)
+		@_moveKnobY(@scrollKnob.y + (e.originalEvent.wheelDelta || -e.originalEvent.detail))
 		e.preventDefault()
 	_mouseDown: (e)->
 		# knob drag
