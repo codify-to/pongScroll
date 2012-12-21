@@ -11,6 +11,7 @@ window.initGame = ->
 
 	# Create console
 	terminal = new Terminal(game)
+	window.hadouken = terminal.hadouken
 
 $("header").fadeOut(0)
 

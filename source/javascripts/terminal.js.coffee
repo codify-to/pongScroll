@@ -3,6 +3,12 @@ class Terminal
     #Prevent errors and warning from outputing on console
     #window.onerror = () -> true
 
+    # Loads Hadouken sound
+    queue = new createjs.PreloadJS();
+    queue.installPlugin(createjs.SoundJS) #Plug in SoundJS to handle browser-specific paths
+    queue.loadFile({src:"media/hadouken.mp3", id:"hadouken"}, true)
+
+    # Defines a clear function for the console
     if (console._commandLineAPI?)
       window.clear = console._commandLineAPI.clear
     else if (console._inspectorCommandLineAPI?)
@@ -12,10 +18,12 @@ class Terminal
     else
       window.clear = ()-> console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
+    # Check continously if user types one of the predefined variables
     setInterval =>
       @checkVariables()
     ,500
 
+    # Show the menu on Terminal
     setTimeout  =>
         @printMenu()
     , 1000
@@ -28,7 +36,6 @@ class Terminal
       setTimeout  =>
         @printMenu()
       , 1000
-      
     if(window.ballColor)
       @printMessage("Você setou a cor para #{window.ballColor}")
       @gameInstance.ballColor = window.ballColor
@@ -43,6 +50,20 @@ class Terminal
       setTimeout  =>
         @printMenu()
       , 1000
+
+  hadouken: () =>
+    createjs.SoundJS.play("hadouken")
+    console.log " _   _   ___ ______ _____ _   _ _   __ _____ _   _ \n
+| | | | / _ \\|  _  \\  _  | | | | | / /|  ___| \\ | |\n
+| |_| |/ /_\\ \\ | | | | | | | | | |/ / | |__ |  \\| |\n
+|  _  ||  _  | | | | | | | | | |    \\ |  __|| . ` |\n
+| | | || | | | |/ /\\ \\_/ / |_| | |\\  \\| |___| |\\  |\n
+\\_| |_/\\_| |_/___/  \\___/ \\___/\\_| \\_/\\____/\\_| \\_/"
+    setTimeout  =>
+        @printMenu()
+    , 1000
+    return
+
 
   printMessage: (str) ->
     window.clear()
@@ -71,9 +92,10 @@ class Terminal
 ┃           (changes the ball color, defaults to \"#1bc1ff\")    ┃\n
 ┃     ‣ paddleSize = number                                    ┃\n
 ┃           (changes the player's paddle size)                 ┃\n
-┃     ‣ haduken()                                              ┃\n
+┃     ‣ hadouken()                                             ┃\n
 ┃           (Why don't you try it out?)                        ┃\n
 ┃                                                              ┃\n
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
 
 window.Terminal = Terminal
