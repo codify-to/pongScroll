@@ -3,10 +3,11 @@ class Terminal
     #Prevent errors and warning from outputing on console
     #window.onerror = () -> true
     if(BrowserDetect.OS == "Mac")
-      if(BrowserDetect.browser == "Chrome")
-        console.log("macchrome")
+      if(BrowserDetect.browser == "Chrome" || BrowserDetect.browser == "Safari")
+        $(".message").hide().text("⌘ ⌥ i").fadeIn()
+        $(".message").delay(5000).fadeOut()
       else if(BrowserDetect.browser == "Firefox")
-        console.log("macfirefox")
+        console.log("⌘⌥k")
 
     # Loads Hadouken sound
     queue = new createjs.PreloadJS();
