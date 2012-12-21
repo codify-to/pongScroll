@@ -7,12 +7,13 @@ class Terminal
         $(".message").hide().text("⌘ ⌥ i").fadeIn()
         $(".message").delay(10000).fadeOut()
       else if(BrowserDetect.browser == "Firefox")
-        console.log("⌘⌥k")
+        $(".message").hide().text("⌘ ⌥ k").fadeIn()
+        $(".message").delay(10000).fadeOut()
 
     # Loads Hadouken sound
     queue = new createjs.PreloadJS();
     queue.installPlugin(createjs.SoundJS) #Plug in SoundJS to handle browser-specific paths
-    queue.loadFile({src:"media/hadouken.mp3", id:"hadouken"}, true)
+    queue.loadFile({src:"media/hadouken.mp3|media/hadouken.ogg", id:"hadouken"}, true)
 
     # Defines a clear function for the console
     if (console._commandLineAPI?)
