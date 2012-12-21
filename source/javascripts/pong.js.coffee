@@ -42,8 +42,6 @@ class Pong
 
 		# leftPaddle = new 
 	start: ->
-		# Reset score
-		@_setScore(0)
 		# Reset scroll
 		@scrollKnob.y = KNOB_MARGIN_TOP
 		# Reset ball direction
@@ -51,6 +49,8 @@ class Pong
 
 		@playAgain()
 	playAgain: ()->
+		# Reset score
+		@_setScore(0)
 		# Set ball position
 		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
 		@ball.y = @scrollKnob.y + @scrollKnob.height/2

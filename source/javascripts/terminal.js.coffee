@@ -5,7 +5,7 @@ class Terminal
     if(BrowserDetect.OS == "Mac")
       if(BrowserDetect.browser == "Chrome" || BrowserDetect.browser == "Safari")
         $(".message").hide().text("⌘ ⌥ i").fadeIn()
-        $(".message").delay(5000).fadeOut()
+        $(".message").delay(10000).fadeOut()
       else if(BrowserDetect.browser == "Firefox")
         console.log("⌘⌥k")
 
