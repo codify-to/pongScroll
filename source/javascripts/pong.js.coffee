@@ -19,18 +19,17 @@ class Pong
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
 		@initialBallSpeed = 20
-		# Create scrollbar
+		# Create the scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
+		@scrollUpRect = new createjs.Rectangle(0, 0, SCROLL_WIDTH, SCROLL_WIDTH)
 		@scrollUpImage = new Image()
 		@scrollUpImage.src = "images/scrollUp.jpg"
+		@scrollDownRect = new createjs.Rectangle(0, 0, SCROLL_WIDTH, SCROLL_WIDTH)
 		@scrollDownImage = new Image()
 		@scrollDownImage.src = "images/scrollDown.jpg"
-		
-		# Creating the scrollbar
 
-		# Setup enter frame
+		# Setup 'update' timer
 		createjs.Ticker.addListener @
-
 
 		# Setup listeners
 		window.onresize = =>
@@ -39,6 +38,10 @@ class Pong
 		# 
 		$(window).bind "mousewheel", (e)=>
 			@_scroll(e)
+		$(@canvas).bind "mousedown", (e)=>
+			@_mouseDown(e)
+		$(@canvas).bind "mouseup", (e)=>
+			@_mouseUp(e)
 
 		# leftPaddle = new 
 	start: ->
@@ -54,29 +57,22 @@ class Pong
 	stop: ->
 		@started = false
 	tick: ->
-		# Fade all elements
+		
+		# 
+		# Update game logic
+		# 
+		@_updateGame() if @started
+
+		# 
+		# Fade all elements (trail)
+		# 
 		@ctx.fillStyle = "rgba(255, 255, 255, #{TRAIL})"
 		@ctx.fillRect(0, 0, @canvas.width, @canvas.height)
 
-		# Update positions if we're playing
-		@_updateGame() if @started
-
+		# 
 		# Draw all elements
-		@ctx.fillStyle = "rgb(0, 0, 0)"
-		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y, @gamePaddle.width, @gamePaddle.height)
-		@ctx.fillStyle = @ballColor
-		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
-		# Scroll bar
-		@ctx.fillStyle = "#eeeeee"
-		@ctx.fillRect(@scrollKnob.x, 0, @scrollKnob.width, @canvas.height)
-		@ctx.fillStyle = "#c0c0c0"
-		@ctx.fillRect(@scrollKnob.x + 2, @scrollKnob.y + 2, @scrollKnob.width - 2, @scrollKnob.height)
-		@ctx.lineWidth = 1
-		@ctx.strokeStyle = "#808080"
-		@ctx.strokeRect(@scrollKnob.x + 0.5, @scrollKnob.y + 0.5, @scrollKnob.width - 1, @scrollKnob.height)
-		# Top and bottom buttons
-		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
-		@ctx.drawImage(@scrollDownImage, @canvas.width - SCROLL_WIDTH, @canvas.height - KNOB_MARGIN_BOTTOM)
+		# 
+		@_draw()
 
 	# Commandline interface
 	setSpeed: (s)->
@@ -84,7 +80,12 @@ class Pong
 	setPaddleSize: (size)->
 		# Save size
 		@scrollKnob.height = size
-	# Private
+	
+	# 
+	# Private methods
+	# 
+
+	# Game logic
 	_updateGame: ->
 
 		# Check if it's time to follow the ball
@@ -132,8 +133,11 @@ class Pong
 			nextBall.speed = @ball.speed
 			@ball = nextBall
 
+		# 
+		# 
 		# Let's see now if someone scored
-
+		# 
+		# 
 		# Computer missed, user scored
 		if nextBall.x < 0
 			@_setScore(@score + 1)
@@ -142,6 +146,27 @@ class Pong
 		else if nextBall.x > @canvas.width - @ball.width
 			@_newUserRound()
 
+	# Draw the game
+	_draw: ()->
+		# Game paddle
+		@ctx.fillStyle = "rgb(0, 0, 0)"
+		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y, @gamePaddle.width, @gamePaddle.height)
+		# Ball
+		@ctx.fillStyle = @ballColor
+		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
+		# Scroll bar
+		@ctx.fillStyle = "#eeeeee"
+		@ctx.fillRect(@scrollKnob.x, 0, @scrollKnob.width, @canvas.height)
+		@ctx.fillStyle = "#c0c0c0"
+		@ctx.fillRect(@scrollKnob.x + 2, @scrollKnob.y + 2, @scrollKnob.width - 2, @scrollKnob.height)
+		@ctx.lineWidth = 1
+		@ctx.strokeStyle = "#808080"
+		@ctx.strokeRect(@scrollKnob.x + 0.5, @scrollKnob.y + 0.5, @scrollKnob.width - 1, @scrollKnob.height)
+		# Top and bottom buttons
+		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
+		@ctx.drawImage(@scrollDownImage, @canvas.width - SCROLL_WIDTH, @canvas.height - KNOB_MARGIN_BOTTOM)
+
+	# Updates score and it's interface
 	_setScore: (score)->
 		@score = score
 		$(".score .num").text(score)
@@ -167,7 +192,12 @@ class Pong
 	_resize: (e)->
 		@canvas.width = window.innerWidth
 		@canvas.height = window.innerHeight
-		@scrollKnob.x = @canvas.width - SCROLL_WIDTH
+
+		# Set elements positions (align)
+		@scrollKnob.x = 
+		@scrollUpRect.x =
+		@scrollDownRect.x =
+			@canvas.width - SCROLL_WIDTH
 	_scroll: (e)->
 		# Check if we're starting the game
 		if not @started
@@ -181,10 +211,15 @@ class Pong
 		@scrollKnob.y = KNOB_MARGIN_TOP if @scrollKnob.y < KNOB_MARGIN_TOP
 		@scrollKnob.y = @canvas.height - KNOB_MARGIN_BOTTOM - @scrollKnob.height if @scrollKnob.y > @canvas.height - @scrollKnob.height - KNOB_MARGIN_BOTTOM
 		e.preventDefault()
+	_mouseDown: (e)->
+		if @ball
 
 # Export
 window.Pong = Pong
 
+# 
+#  Helpers
+# 
 lineIntersectsLine = (l1p1, l1p2, l2p1, l2p2) ->
 	q = (l1p1.Y - l2p1.Y) * (l2p2.X - l2p1.X) - (l1p1.X - l2p1.X) * (l2p2.Y - l2p1.Y)
 	d = (l1p2.X - l1p1.X) * (l2p2.Y - l2p1.Y) - (l1p2.Y - l1p1.Y) * (l2p2.X - l2p1.X)
@@ -199,3 +234,5 @@ lineIntersectsLine = (l1p1, l1p2, l2p1, l2p2) ->
 		return false;
 
 	return true;
+createjs.Rectangle.prototype.containsPoint = (x, y)->
+	(x >= @x && y >= @y && x <= @x + @width && y <= @y + @height)
