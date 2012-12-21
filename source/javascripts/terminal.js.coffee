@@ -38,7 +38,7 @@ class Terminal
       , 1000
     if(window.paddleSize)
       @printMessage("Você setou o tamanho do paddle para #{window.paddleSize}")
-      @gameInstance.setPaddleSize = window.paddleSize
+      @gameInstance.setPaddleSize(window.paddleSize)
       window.paddleSize = null
       setTimeout  =>
         @printMenu()
@@ -66,7 +66,7 @@ class Terminal
 ┃                                                              ┃\n
 ┃                                                              ┃\n
 ┃     ‣ ballSpeed = number                                     ┃\n
-┃           (changes the ball speed, defaults to 0.5)          ┃\n
+┃           (changes the ball speed, defaults to 20)           ┃\n
 ┃     ‣ ballColor = string                                     ┃\n
 ┃           (changes the ball color, defaults to \"#1bc1ff\")    ┃\n
 ┃     ‣ paddleSize = number                                    ┃\n

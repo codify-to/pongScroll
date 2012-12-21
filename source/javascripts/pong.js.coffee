@@ -28,6 +28,10 @@ class Pong
 		@scrollDownImage = new Image()
 		@scrollDownImage.src = "images/scrollDown.jpg"
 
+
+		# Setup framerate
+		createjs.Ticker.setFPS(60)
+
 		# Setup 'update' timer
 		createjs.Ticker.addListener @
 
@@ -77,15 +81,12 @@ class Pong
 	# Commandline interface
 	setSpeed: (s)->
 		@initialBallSpeed = s
+		@ball.speed = @initialBallSpeed
 	setPaddleSize: (size)->
 		# Save size
-		@scrollKnob.height = size
-	
-	# 
-	# Private methods
-	# 
+		@scrollKnob.height = @gamePaddle.height = size
 
-	# Game logic
+	# Private
 	_updateGame: ->
 
 		# Check if it's time to follow the ball
@@ -112,17 +113,20 @@ class Pong
 		ballP2 = {X: nextBall.x, Y: nextBall.y + nextBall.height/2}
 
 		# Paddle Collision
+		# Computer Paddle
 		if lineIntersectsLine(ballP1, ballP2, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y}, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y+@gamePaddle.height})
 			a = @ball.height/2 + (@ball.y - @gamePaddle.y)
 			a = (a / @gamePaddle.height)*2 - 1
 			a = a * ANGLE_VARIATION
 			@ball.angle = a
 			return
+		# User Paddle
 		else if lineIntersectsLine(ballP1, ballP2, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y}, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y+@scrollKnob.height})
 			a = @ball.height/2 + (@ball.y - @scrollKnob.y)
 			a = (a / @scrollKnob.height)*2 - 1
 			a = Math.PI - (a * ANGLE_VARIATION)
 			@ball.angle = a
+			@ball.speed += 1
 			return
 		# Wall Collision
 		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
