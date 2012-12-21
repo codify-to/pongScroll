@@ -2,6 +2,11 @@ class Terminal
   constructor: (@gameInstance) ->
     #Prevent errors and warning from outputing on console
     #window.onerror = () -> true
+    if(BrowserDetect.OS == "Mac")
+      if(BrowserDetect.browser == "Chrome")
+        console.log("macchrome")
+      else if(BrowserDetect.browser == "Firefox")
+        console.log("macfirefox")
 
     # Loads Hadouken sound
     queue = new createjs.PreloadJS();
