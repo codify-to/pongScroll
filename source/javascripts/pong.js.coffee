@@ -212,8 +212,15 @@ class Pong
 		@scrollKnob.y = @canvas.height - KNOB_MARGIN_BOTTOM - @scrollKnob.height if @scrollKnob.y > @canvas.height - @scrollKnob.height - KNOB_MARGIN_BOTTOM
 		e.preventDefault()
 	_mouseDown: (e)->
-		if @ball
-
+		# knob drag
+		if @scrollKnob.containsPoint(e.clientX, e.clientY)
+			@scrollKnob.clickOffset = e.clientY - @scrollKnob.y
+			$(@canvas).bind('mousemove', (ev)=> @_mouseMove(ev))
+		
+	_mouseUp: (e)->
+		$(@canvas).unbind('mousemove')
+	_mouseMove: (e)->
+		@scrollKnob.y = e.clientY - @scrollKnob.clickOffset
 # Export
 window.Pong = Pong
 
