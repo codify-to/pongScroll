@@ -4,7 +4,7 @@ KNOB_MARGIN_BOTTOM = 18
 ANGLE_VARIATION = Math.PI / 4
 TRAIL = 0.5
 
-PADDLE_SPEED = 15
+PADDLE_SPEED = 8
 
 class Pong
 	ballColor: "#1bc1ff"
@@ -15,10 +15,10 @@ class Pong
 		@ctx = @canvas.getContext('2d')
 		
 		# Creating the left paddle (that the game controls)
-		@gamePaddle = new createjs.Rectangle(20, 0, 30, 180)
+		@gamePaddle = new createjs.Rectangle(20, window.innerHeight/2 - 90, 30, 180)
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
-		@initialBallSpeed = 20
+		@initialBallSpeed = 15
 		# Create the scrollbar
 		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
 		@scrollUpRect = new createjs.Rectangle(0, 0, SCROLL_WIDTH, SCROLL_WIDTH)
@@ -56,8 +56,20 @@ class Pong
 		# Reset ball direction
 		@ball.angle = 0
 
-		@_newUserRound()
-		
+		@playAgain()
+	playAgain: ()->
+		# Set ball position
+		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
+		@ball.y = @scrollKnob.y + @scrollKnob.height/2
+		# Reset game speed
+		@ball.speed = @initialBallSpeed
+		# stop wintil user scrolls
+		@started = false
+		# Show tooltip
+		$("img.start").fadeIn()
+		$(".score").fadeOut()
+		# Hide hype animations
+		$("#intro_hype_container").fadeOut(300)
 	stop: ->
 		@started = false
 	tick: ->
@@ -148,7 +160,7 @@ class Pong
 			@_newComputerRound()
 		# User lost
 		else if nextBall.x > @canvas.width - @ball.width
-			@_newUserRound()
+			@_gameOver()
 
 	# Draw the game
 	_draw: ()->
@@ -175,23 +187,22 @@ class Pong
 		@score = score
 		$(".score .num").text(score)
 	# Rounds
-	_newUserRound: ()->
-		# Set ball position
-		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
-		@ball.y = @scrollKnob.y + @scrollKnob.height/2
-		# Reset game speed
-		@ball.speed = @initialBallSpeed
-		# stop wintil user scrolls
-		@started = false
-		# Show tooltip
-		$("img.start").fadeIn()
-		$(".score").fadeOut()
 	_newComputerRound: ()->
 		# Set ball position
 		@ball.x = @gamePaddle.x + @gamePaddle.width + 5
 		@ball.y = @gamePaddle.y + Math.random()*@gamePaddle.height
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
+	_gameOver: ()->
+		return if not @started
+		@started = false
+		# Show animation
+		$("#intro_hype_container").show()
+		doc = HYPE.documents["intro"]
+		doc.showSceneNamed("game over")
+		score = doc.getElementById('animScore')
+		$(score).html("<span class='animScore'>#{@score}<span class='pts'>PTS</span></span>")
+		# Set score
 	# Listeners
 	_resize: (e)->
 		@canvas.width = window.innerWidth

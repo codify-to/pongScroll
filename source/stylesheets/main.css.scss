@@ -1,3 +1,6 @@
+body{
+	height: 100%;
+}
 // header with logo and score
 header{
 	margin: 15px 40px 0 20px;
@@ -18,6 +21,9 @@ header{
 		text-align: right;
 		float: right;
 
+		// Starts hidden
+		display: none;
+
 		.num{
 			font-size: 126px;
 			margin: -5px -15px 0 0;
@@ -32,10 +38,21 @@ header{
 
 }
 
+// Animations
+#intro_hype_container{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin: -200px 0 0 -300px;
+}
+
 .start {
 	position: absolute;
 	top: 30px;
-	right: 40px
+	right: 40px;
+
+	// Starts hidden
+	display: none;
 }
 
 // Canvas
@@ -49,6 +66,15 @@ header{
 	// Keep it behind the other elements
 	z-index: -1;
 }
+.animScore {
+	font-size: 50px !important;
+	font-family: "pixelmixregular" !important;
+	color: #ffdb5d !important;
+
+	.pts{
+		font-size: 25px !important;
+	}
+}
 
 // Footer with like buttons
 footer{
@@ -60,7 +86,7 @@ footer{
 	font-size: 8px;
 	font-family: "pixelmixregular";
 
-	p {
+	img.credits {
 		float: left;
 		margin-top: 50px;
 	}
