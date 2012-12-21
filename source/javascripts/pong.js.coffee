@@ -60,7 +60,7 @@ class Pong
 		@started = false
 		# Show tooltip
 		$("img.start").fadeIn()
-		$(".score").fadeOut()
+		$(".score").fadeOut(0)
 		# Hide hype animations
 		$("#intro_hype_container").fadeOut(300)
 
