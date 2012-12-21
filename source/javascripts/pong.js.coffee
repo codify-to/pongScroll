@@ -39,13 +39,6 @@ class Pong
 		window.onresize = =>
 			@_resize()
 		@_resize()
-		# 
-		$(window).bind "mousewheel", (e)=>
-			@_scroll(e)
-		$(@canvas).bind "mousedown", (e)=>
-			@_mouseDown(e)
-		$(@canvas).bind "mouseup", (e)=>
-			@_mouseUp(e)
 
 		# leftPaddle = new 
 	start: ->
@@ -70,8 +63,16 @@ class Pong
 		$(".score").fadeOut()
 		# Hide hype animations
 		$("#intro_hype_container").fadeOut(300)
-	stop: ->
-		@started = false
+
+		# Bind interaction events
+		# 
+		$(window).bind "mousewheel", (e)=>
+			@_scroll(e)
+		$(@canvas).bind "mousedown", (e)=>
+			@_mouseDown(e)
+		$(@canvas).bind "mouseup", (e)=>
+			@_mouseUp(e)
+
 	tick: ->
 		
 		# 
@@ -196,6 +197,12 @@ class Pong
 	_gameOver: ()->
 		return if not @started
 		@started = false
+
+		# Unbind interaction
+		$(window).unbind "mousewheel"
+		$(@canvas).unbind "mousedown"
+		$(@canvas).unbind "mouseup"
+
 		# Show animation
 		$("#intro_hype_container").show()
 		doc = HYPE.documents["intro"]
