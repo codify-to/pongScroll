@@ -168,7 +168,7 @@ class Pong
 		@ctx.strokeRect(@scrollKnob.x + 0.5, @scrollKnob.y + 0.5, @scrollKnob.width - 1, @scrollKnob.height)
 		# Top and bottom buttons
 		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
-		@ctx.drawImage(@scrollDownImage, @canvas.width - SCROLL_WIDTH, @canvas.height - KNOB_MARGIN_BOTTOM)
+		@ctx.drawImage(@scrollDownImage, @scrollDownRect.x, @scrollDownRect.y)
 
 	# Updates score and it's interface
 	_setScore: (score)->
@@ -202,18 +202,9 @@ class Pong
 		@scrollUpRect.x =
 		@scrollDownRect.x =
 			@canvas.width - SCROLL_WIDTH
+		@scrollDownRect.y = @canvas.height - KNOB_MARGIN_BOTTOM
 	_scroll: (e)->
-		# Check if we're starting the game
-		if not @started
-			# Show tooltip
-			$("img.start").fadeOut(300)
-			$(".score").delay(300).fadeIn()
-			@started = true
-
-		@scrollKnob.y += e.originalEvent.wheelDelta
-		# Keep in bounds
-		@scrollKnob.y = KNOB_MARGIN_TOP if @scrollKnob.y < KNOB_MARGIN_TOP
-		@scrollKnob.y = @canvas.height - KNOB_MARGIN_BOTTOM - @scrollKnob.height if @scrollKnob.y > @canvas.height - @scrollKnob.height - KNOB_MARGIN_BOTTOM
+		@_moveKnobY(@scrollKnob.y + e.originalEvent.wheelDelta)
 		e.preventDefault()
 	_mouseDown: (e)->
 		# knob drag
@@ -223,8 +214,28 @@ class Pong
 		
 	_mouseUp: (e)->
 		$(@canvas).unbind('mousemove')
+
+		# Scroll up click
+		if @scrollUpRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@scrollKnob.y - 15)
+		# Scroll down click
+		else if @scrollDownRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@scrollKnob.y + 15)
+
 	_mouseMove: (e)->
-		@scrollKnob.y = e.clientY - @scrollKnob.clickOffset
+		@_moveKnobY(e.clientY - @scrollKnob.clickOffset)
+	_moveKnobY: (y)->
+		@scrollKnob.y = y
+		@scrollKnob.y = KNOB_MARGIN_TOP if @scrollKnob.y < KNOB_MARGIN_TOP
+		@scrollKnob.y = @canvas.height - KNOB_MARGIN_BOTTOM - @scrollKnob.height if @scrollKnob.y > @canvas.height - @scrollKnob.height - KNOB_MARGIN_BOTTOM
+
+		# Check if we're starting the game
+		if not @started
+			# Show tooltip
+			$("img.start").fadeOut(300)
+			$(".score").delay(300).fadeIn()
+			@started = true
+
 # Export
 window.Pong = Pong
 
