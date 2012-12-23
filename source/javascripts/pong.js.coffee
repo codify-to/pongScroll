@@ -1,6 +1,3 @@
-SCROLL_WIDTH = 18
-KNOB_MARGIN_TOP = 18
-KNOB_MARGIN_BOTTOM = 18
 ANGLE_VARIATION = Math.PI / 4
 TRAIL = 0.5
 
@@ -20,13 +17,10 @@ class Pong
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
 		@initialBallSpeed = 15
 		# Create the scrollbar
-		@scrollKnob = new createjs.Rectangle(0, KNOB_MARGIN_TOP, SCROLL_WIDTH, 250)
-		@scrollUpRect = new createjs.Rectangle(0, 0, SCROLL_WIDTH, SCROLL_WIDTH)
-		@scrollUpImage = new Image()
-		@scrollUpImage.src = "images/scrollUp.jpg"
-		@scrollDownRect = new createjs.Rectangle(0, 0, SCROLL_WIDTH, SCROLL_WIDTH)
-		@scrollDownImage = new Image()
-		@scrollDownImage.src = "images/scrollDown.jpg"
+		if BrowserDetect.OS == "Mac"
+			@scroll = new WinScrollbar(@canvas)
+		else
+			@scroll = new WinScrollbar(@canvas)
 
 
 		# Setup framerate
@@ -36,14 +30,16 @@ class Pong
 		createjs.Ticker.addListener @
 
 		# Setup listeners
-		window.onresize = =>
+		$(window).bind "resize", =>
 			@_resize()
 		@_resize()
+		$(@scroll).bind 'knobmove', =>
+			@_knobMove()
 
 		# leftPaddle = new 
 	start: ->
 		# Reset scroll
-		@scrollKnob.y = KNOB_MARGIN_TOP
+		@scroll.reset()
 		# Reset ball direction
 		@ball.angle = 0
 
@@ -52,8 +48,8 @@ class Pong
 		# Reset score
 		@_setScore(0)
 		# Set ball position
-		@ball.x = @canvas.width - @ball.width - SCROLL_WIDTH - 5
-		@ball.y = @scrollKnob.y + @scrollKnob.height/2
+		@ball.x = @canvas.width - @ball.width - @scroll.width - 5
+		@ball.y = @scroll.knob.y + @scroll.knob.height/2
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
 		# stop wintil user scrolls
@@ -66,12 +62,7 @@ class Pong
 
 		# Bind interaction events
 		# 
-		$(window).bind "mousewheel DOMMouseScroll", (e)=>
-			@_scroll(e)
-		$(@canvas).bind "mousedown", (e)=>
-			@_mouseDown(e)
-		$(@canvas).bind "mouseup", (e)=>
-			@_mouseUp(e)
+		@scroll.enable()
 
 	tick: ->
 		
@@ -97,7 +88,7 @@ class Pong
 		@ball.speed = @initialBallSpeed
 	setPaddleSize: (size)->
 		# Save size
-		@scrollKnob.height = @gamePaddle.height = size
+		@scroll.knob.height = @gamePaddle.height = size
 
 	# Hadouken special
 	hadouken: ()->		
@@ -148,9 +139,9 @@ class Pong
 			@ball.angle = a
 			return
 		# User Paddle
-		else if lineIntersectsLine(ballP1, ballP2, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y}, {X: @scrollKnob.x-@scrollKnob.width, Y: @scrollKnob.y+@scrollKnob.height})
-			a = @ball.height/2 + (@ball.y - @scrollKnob.y)
-			a = (a / @scrollKnob.height)*2 - 1
+		else if lineIntersectsLine(ballP1, ballP2, {X: @scroll.knob.x-@scroll.knob.width, Y: @scroll.knob.y}, {X: @scroll.knob.x-@scroll.knob.width, Y: @scroll.knob.y+@scroll.knob.height})
+			a = @ball.height/2 + (@ball.y - @scroll.knob.y)
+			a = (a / @scroll.knob.height)*2 - 1
 			a = Math.PI - (a * ANGLE_VARIATION)
 			@ball.angle = a
 			@ball.speed += 1
@@ -186,18 +177,7 @@ class Pong
 		@ctx.fillStyle = @ballColor
 		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
 		# Scroll bar
-		@ctx.fillStyle = "#eeeeee"
-		@ctx.fillRect(@scrollKnob.x, 0, @scrollKnob.width, @canvas.height)
-		@ctx.fillStyle = "#c0c0c0"
-		@ctx.fillRect(@scrollKnob.x + 2, @scrollKnob.y + 2, @scrollKnob.width - 2, @scrollKnob.height)
-		@ctx.lineWidth = 1
-		@ctx.strokeStyle = "#808080"
-		@ctx.strokeRect(@scrollKnob.x + 0.5, @scrollKnob.y + 0.5, @scrollKnob.width - 1, @scrollKnob.height)
-		# Top and bottom buttons
-		@ctx.drawImage(@scrollUpImage, @canvas.width - SCROLL_WIDTH, 0)
-		@ctx.drawImage(@scrollDownImage, @scrollDownRect.x, @scrollDownRect.y)
-			
-		
+		@scroll.draw()
 
 	# Updates score and it's interface
 	_setScore: (score)->
@@ -215,9 +195,7 @@ class Pong
 		@started = false
 
 		# Unbind interaction
-		$(window).unbind "mousewheel DOMMouseScroll"
-		$(@canvas).unbind "mousedown"
-		$(@canvas).unbind "mouseup"
+		@scroll.disable()
 
 		# Show animation
 		$("#intro_hype_container").show()
@@ -230,39 +208,8 @@ class Pong
 	_resize: (e)->
 		@canvas.width = window.innerWidth
 		@canvas.height = window.innerHeight
-
-		# Set elements positions (align)
-		@scrollKnob.x = 
-		@scrollUpRect.x =
-		@scrollDownRect.x =
-			@canvas.width - SCROLL_WIDTH
-		@scrollDownRect.y = @canvas.height - KNOB_MARGIN_BOTTOM
-	_scroll: (e)->
-		@_moveKnobY(@scrollKnob.y + (e.originalEvent.wheelDelta || -e.originalEvent.detail))
-		e.preventDefault()
-	_mouseDown: (e)->
-		# knob drag
-		if @scrollKnob.containsPoint(e.clientX, e.clientY)
-			@scrollKnob.clickOffset = e.clientY - @scrollKnob.y
-			$(@canvas).bind('mousemove', (ev)=> @_mouseMove(ev))
-		
-	_mouseUp: (e)->
-		$(@canvas).unbind('mousemove')
-
-		# Scroll up click
-		if @scrollUpRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@scrollKnob.y - 15)
-		# Scroll down click
-		else if @scrollDownRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@scrollKnob.y + 15)
-
-	_mouseMove: (e)->
-		@_moveKnobY(e.clientY - @scrollKnob.clickOffset)
-	_moveKnobY: (y)->
-		@scrollKnob.y = y
-		@scrollKnob.y = KNOB_MARGIN_TOP if @scrollKnob.y < KNOB_MARGIN_TOP
-		@scrollKnob.y = @canvas.height - KNOB_MARGIN_BOTTOM - @scrollKnob.height if @scrollKnob.y > @canvas.height - @scrollKnob.height - KNOB_MARGIN_BOTTOM
-
+		@scroll.resize()
+	_knobMove: ()->
 		# Check if we're starting the game
 		if not @started
 			# Show tooltip
@@ -290,5 +237,3 @@ lineIntersectsLine = (l1p1, l1p2, l2p1, l2p2) ->
 		return false;
 
 	return true;
-createjs.Rectangle.prototype.containsPoint = (x, y)->
-	(x >= @x && y >= @y && x <= @x + @width && y <= @y + @height)
