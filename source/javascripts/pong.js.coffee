@@ -18,7 +18,7 @@ class Pong
 		@initialBallSpeed = 15
 		# Create the scrollbar
 		if BrowserDetect.OS == "Mac"
-			@scroll = new WinScrollbar(@canvas)
+			@scroll = new Scrollbar(@canvas)
 		else
 			@scroll = new WinScrollbar(@canvas)
 
@@ -165,7 +165,7 @@ class Pong
 			@_setScore(@score + 1)
 			@_newComputerRound()
 		# User lost
-		else if nextBall.x > @canvas.width - @ball.width
+		else if nextBall.x > @canvas.width + @ball.width
 			@_gameOver()
 
 	# Draw the game

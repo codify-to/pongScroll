@@ -1,8 +1,95 @@
-class WinScrollbar
+class Scrollbar
+	width: 10,
+	knobMargin: 0,
+	constructor: (@canvas) ->
+		@knob = new createjs.Rectangle(0, @knobMargin, @width, 250)
+		@ctx = @canvas.getContext '2d'
+
+	# Window resizing
+	resize: ->
+		# Set elements positions (align)
+		@knob.x = @canvas.width - @width
+	draw: ->
+		@ctx.clearRect(@knob.x + 3, @knob.y, @knob.width - 5, @knob.height)
+
+		x = @knob.x+2; y = @knob.y
+		width = @knob.width-5; height = @knob.height
+		radius = 3
+
+		@ctx.beginPath();
+		@ctx.moveTo(x + radius, y);
+		@ctx.lineTo(x + width - radius, y);
+		@ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+		@ctx.lineTo(x + width, y + height - radius);
+		@ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+		@ctx.lineTo(x + radius, y + height);
+		@ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+		@ctx.lineTo(x, y + radius);
+		@ctx.quadraticCurveTo(x, y, x + radius, y);
+		@ctx.closePath();
+
+		@ctx.fillStyle = "rgba(0,0,0,0.6)"
+		@ctx.fill()
+		
+		# @ctx.fillRect(@knob.x + 3, @knob.y, @knob.width - 5, @knob.height)
+
+	# Enable and disable scroll interaction by managing it's events
+	enable: ->
+		$(window).bind "mousewheel DOMMouseScroll", (e)=>
+			@_scroll(e)
+		$(@canvas).bind "mousedown", (e)=>
+			@_mouseDown(e)
+		$(window).bind "mouseup", (e)=>
+			@_mouseUp(e)
+	disable: ->
+		$(window).unbind "mousewheel DOMMouseScroll"
+		$(@canvas).unbind "mousedown"
+		$(window).unbind "mouseup"
+		$(window).unbind "mousemove"
+	# 
+	reset: ->
+		@knob.y = @knobMargin
+
+	# Move the knob in Y axis
+	# This will trigger events
+	_moveKnobY: (y)->
+		@knob.y = y
+		@knob.y = @knobMargin if @knob.y < @knobMargin
+		@knob.y = @canvas.height - @knobMargin - @knob.height if @knob.y > @canvas.height - @knob.height - @knobMargin
+		$(@).trigger('knobmove')
+
+	# 
+	# Internal mouse management stuff
+	# 
+	_mouseDown: (e)->
+		# knob drag
+		if @knob.containsPoint(e.clientX, e.clientY)
+			@knob.clickOffset = e.clientY - @knob.y
+			$(window).bind('mousemove', (ev)=> @_mouseMove(ev))
+	_mouseUp: (e)->
+		$(window).unbind('mousemove')
+
+		# Scroll up click
+		if @upRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@knob.y - 15)
+		# Scroll down click
+		else if @downRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@knob.y + 15)
+	_mouseMove: (e)->
+		@_moveKnobY(e.clientY - @knob.clickOffset)
+	# User scroll interaction
+	_scroll: (e)->
+		@_moveKnobY(@knob.y + (e.originalEvent.wheelDelta || -e.originalEvent.detail))
+		e.preventDefault()
+		
+
+class WinScrollbar extends Scrollbar
 	width: 18,
 	knobMargin: 18
 
 	constructor: (@canvas) ->
+
+		super(@canvas)
 
 		# Prepare scroll elements
 		@knob = new createjs.Rectangle(0, @knobMargin, @width, 250)
@@ -12,9 +99,6 @@ class WinScrollbar
 		@downRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
 		@downImage = new Image()
 		@downImage.src = "images/scrollDown.jpg"
-
-		# Draw into this context
-		@ctx = @canvas.getContext '2d'
 
 	draw: ->
 		@ctx.fillStyle = "#eeeeee"
@@ -28,48 +112,6 @@ class WinScrollbar
 		@ctx.drawImage(@upImage, @canvas.width - @width, 0)
 		@ctx.drawImage(@downImage, @downRect.x, @downRect.y)
 
-	reset: ->
-		@knob.y = @knobMargin
-
-	# Enable and disable scroll interaction by managing it's events
-	enable: ->
-		$(window).bind "mousewheel DOMMouseScroll", (e)=>
-			@_scroll(e)
-		$(@canvas).bind "mousedown", (e)=>
-			@_mouseDown(e)
-		$(@canvas).bind "mouseup", (e)=>
-			@_mouseUp(e)
-	disable: ->
-		$(window).unbind "mousewheel DOMMouseScroll"
-		$(@canvas).unbind "mousedown"
-		$(@canvas).unbind "mouseup"
-
-	# User scroll interaction
-	_scroll: (e)->
-		@_moveKnobY(@knob.y + (e.originalEvent.wheelDelta || -e.originalEvent.detail))
-		e.preventDefault()
-	_mouseDown: (e)->
-		# knob drag
-		if @scrollKnob.containsPoint(e.clientX, e.clientY)
-			@scrollKnob.clickOffset = e.clientY - @scrollKnob.y
-			$(@canvas).bind('mousemove', (ev)=> @_mouseMove(ev))
-	_mouseUp: (e)->
-		$(@canvas).unbind('mousemove')
-
-		# Scroll up click
-		if @scrollUpRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@scrollKnob.y - 15)
-		# Scroll down click
-		else if @scrollDownRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@scrollKnob.y + 15)
-	_mouseMove: (e)->
-		@_moveKnobY(e.clientY - @scrollKnob.clickOffset)
-	_moveKnobY: (y)->
-		@knob.y = y
-		@knob.y = @knobMargin if @knob.y < @knobMargin
-		@knob.y = @canvas.height - @knobMargin - @knob.height if @knob.y > @canvas.height - @knob.height - @knobMargin
-		$(@).trigger('knobmove')
-
 	# Window resizing
 	resize: ->
 		# Set elements positions (align)
@@ -79,12 +121,8 @@ class WinScrollbar
 			@canvas.width - @width
 		@downRect.y = @canvas.height - @knobMargin
 
-# class Scrollbar extends Scrollbar
-# 	constructor: (@canvas) ->
-# 		super(@canvas)
-
 window.WinScrollbar = WinScrollbar
-# window.Scrollbar = Scrollbar
+window.Scrollbar = Scrollbar
 
 # Helper
 createjs.Rectangle.prototype.containsPoint = (x, y)->
