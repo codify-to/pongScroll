@@ -68,13 +68,6 @@ class Scrollbar
 			$(window).bind('mousemove', (ev)=> @_mouseMove(ev))
 	_mouseUp: (e)->
 		$(window).unbind('mousemove')
-
-		# Scroll up click
-		if @upRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@knob.y - 15)
-		# Scroll down click
-		else if @downRect.containsPoint(e.clientX, e.clientY)
-			@_moveKnobY(@knob.y + 15)
 	_mouseMove: (e)->
 		@_moveKnobY(e.clientY - @knob.clickOffset)
 	# User scroll interaction
@@ -120,6 +113,16 @@ class WinScrollbar extends Scrollbar
 		@downRect.x =
 			@canvas.width - @width
 		@downRect.y = @canvas.height - @knobMargin
+
+	_mouseUp: (e)->
+		$(window).unbind('mousemove')
+
+		# Scroll up click
+		if @upRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@knob.y - 15)
+		# Scroll down click
+		else if @downRect.containsPoint(e.clientX, e.clientY)
+			@_moveKnobY(@knob.y + 15)
 
 window.WinScrollbar = WinScrollbar
 window.Scrollbar = Scrollbar
