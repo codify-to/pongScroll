@@ -37,15 +37,15 @@ class Scrollbar
 	enable: ->
 		$(window).bind "mousewheel DOMMouseScroll", (e)=>
 			@_scroll(e)
-		$(@canvas).bind "mousedown", (e)=>
+		$(@canvas).bind "mousedown touchstart", (e)=>
 			@_mouseDown(e)
-		$(window).bind "mouseup", (e)=>
+		$(window).bind "mouseup touchend", (e)=>
 			@_mouseUp(e)
 	disable: ->
 		$(window).unbind "mousewheel DOMMouseScroll"
-		$(@canvas).unbind "mousedown"
-		$(window).unbind "mouseup"
-		$(window).unbind "mousemove"
+		$(@canvas).unbind "mousedown touchstart"
+		$(window).unbind "mouseup touchend"
+		$(window).unbind "mousemove touchmove"
 	# 
 	reset: ->
 		@knob.y = @knobMargin
@@ -62,14 +62,20 @@ class Scrollbar
 	# Internal mouse management stuff
 	# 
 	_mouseDown: (e)->
+		cX = e.clientX || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageX
+		cY = e.clientY || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageY
+		
+
 		# knob drag
-		if @knob.containsPoint(e.clientX, e.clientY)
-			@knob.clickOffset = e.clientY - @knob.y
-			$(window).bind('mousemove', (ev)=> @_mouseMove(ev))
+		if @knob.containsPoint(cX, cY) || Modernizr.touch #Touch enabled devices scroll even when not clicking on the scrollbar
+			@knob.clickOffset = cY - @knob.y
+			$(window).bind('mousemove touchmove', (ev)=> @_mouseMove(ev))
 	_mouseUp: (e)->
-		$(window).unbind('mousemove')
+		$(window).unbind('mousemove touchmove')
 	_mouseMove: (e)->
-		@_moveKnobY(e.clientY - @knob.clickOffset)
+		cY = e.clientY || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageY
+		@_moveKnobY(cY - @knob.clickOffset)
+		e.preventDefault()
 	# User scroll interaction
 	_scroll: (e)->
 		@_moveKnobY(@knob.y + (e.originalEvent.wheelDelta || -e.originalEvent.detail))
@@ -115,13 +121,16 @@ class WinScrollbar extends Scrollbar
 		@downRect.y = @canvas.height - @knobMargin
 
 	_mouseUp: (e)->
-		$(window).unbind('mousemove')
+		$(window).unbind('mousemove touchmove')
+
+		cX = e.clientX || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageX
+		cY = e.clientY || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageY
 
 		# Scroll up click
-		if @upRect.containsPoint(e.clientX, e.clientY)
+		if @upRect.containsPoint(cX, cY)
 			@_moveKnobY(@knob.y - 15)
 		# Scroll down click
-		else if @downRect.containsPoint(e.clientX, e.clientY)
+		else if @downRect.containsPoint(cX, cY)
 			@_moveKnobY(@knob.y + 15)
 
 window.WinScrollbar = WinScrollbar
