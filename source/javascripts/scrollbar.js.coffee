@@ -149,6 +149,8 @@ class WinScrollbar extends Scrollbar
 		@downRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
 		@downImage = new Image()
 		@downImage.src = "images/winScrollDown.jpg"
+		@handleImage = new Image()
+		@handleImage.src = "images/winScrollHandle.jpg"
 
 	draw: ->
 		# Scroll BG
@@ -196,6 +198,10 @@ class WinScrollbar extends Scrollbar
 		@ctx.lineWidth = 1
 		@ctx.strokeStyle = "#979797"
 		@ctx.stroke()
+
+		#scroll Handle
+		@ctx.drawImage(@handleImage, @knob.x + 3, @knob.y + @knob.height / 2)
+
 
 		# Top and bottom buttons
 		@ctx.drawImage(@upImage, @canvas.width - @width, 0)
