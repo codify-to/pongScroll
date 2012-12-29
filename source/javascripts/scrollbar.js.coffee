@@ -157,7 +157,6 @@ class WinScrollbar extends Scrollbar
 
 		# Scroll bar
 		grd = @ctx.createLinearGradient(@knob.x, 0, @knob.x + @knob.width, 0)
-		console.log(@knob.x,@knob.width)
 		grd.addColorStop(0,"#f5f5f5")
 		grd.addColorStop(0.5,"#e9e9eb")
 		grd.addColorStop(0.5,"#d9dadc")		
