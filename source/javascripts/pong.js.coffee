@@ -17,11 +17,13 @@ class Pong
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
 		@initialBallSpeed = 15
 		# Create the scrollbar
-		if BrowserDetect.OS == "Windows"
+		if BrowserDetect.OS == "Linux"
+			@scroll = new DefaultScrollbar(@canvas)
+		else if BrowserDetect.OS == "Windows"
 			@scroll = new WinScrollbar(@canvas)
 		else
 			@scroll = new Scrollbar(@canvas)
-
+			
 
 		# Setup framerate
 		createjs.Ticker.setFPS(60)

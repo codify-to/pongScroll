@@ -82,7 +82,7 @@ class Scrollbar
 		e.preventDefault()
 		
 
-class WinScrollbar extends Scrollbar
+class DefaultScrollbar extends Scrollbar
 	width: 18,
 	knobMargin: 18
 
@@ -94,10 +94,10 @@ class WinScrollbar extends Scrollbar
 		@knob = new createjs.Rectangle(0, @knobMargin, @width, 250)
 		@upRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
 		@upImage = new Image()
-		@upImage.src = "images/scrollUp.jpg"
+		@upImage.src = "images/defaultScrollUp.jpg"
 		@downRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
 		@downImage = new Image()
-		@downImage.src = "images/scrollDown.jpg"
+		@downImage.src = "images/defaultScrollDown.jpg"
 
 	draw: ->
 		@ctx.fillStyle = "#eeeeee"
@@ -133,7 +133,100 @@ class WinScrollbar extends Scrollbar
 		else if @downRect.containsPoint(cX, cY)
 			@_moveKnobY(@knob.y + 15)
 
+class WinScrollbar extends Scrollbar
+	width: 15,
+	knobMargin: 18
+
+	constructor: (@canvas) ->
+
+		super(@canvas)
+
+		# Prepare scroll elements
+		@knob = new createjs.Rectangle(0, @knobMargin, @width, 250)
+		@upRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
+		@upImage = new Image()
+		@upImage.src = "images/winScrollUp.jpg"
+		@downRect = new createjs.Rectangle(0, 0, @width, @knobMargin)
+		@downImage = new Image()
+		@downImage.src = "images/winScrollDown.jpg"
+
+	draw: ->
+		# Scroll BG
+		@ctx.fillStyle = "#f0f0f0"
+		@ctx.fillRect(@knob.x-1, 0, @knob.width+1, @canvas.height)
+
+		# Scroll bar
+		grd = @ctx.createLinearGradient(@knob.x, 0, @knob.x + @knob.width, 0)
+		console.log(@knob.x,@knob.width)
+		grd.addColorStop(0,"#f5f5f5")
+		grd.addColorStop(0.5,"#e9e9eb")
+		grd.addColorStop(0.5,"#d9dadc")		
+		grd.addColorStop(1,"#cfcfd1")
+
+		x = @knob.x+1; y = @knob.y
+		width = @knob.width-1; height = @knob.height
+		radius = 2
+
+		@ctx.beginPath();
+		@ctx.moveTo(x + radius, y);
+		@ctx.lineTo(x + width - radius, y);
+		@ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+		@ctx.lineTo(x + width, y + height - radius);
+		@ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+		@ctx.lineTo(x + radius, y + height);
+		@ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+		@ctx.lineTo(x, y + radius);
+		@ctx.quadraticCurveTo(x, y, x + radius, y);
+		@ctx.closePath();
+		@ctx.fillStyle = grd
+		@ctx.fill()
+
+		x -= 0.5; y -= 0.5
+		
+		@ctx.beginPath();
+		@ctx.moveTo(x + radius, y);
+		@ctx.lineTo(x + width - radius, y);
+		@ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+		@ctx.lineTo(x + width, y + height - radius);
+		@ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+		@ctx.lineTo(x + radius, y + height);
+		@ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+		@ctx.lineTo(x, y + radius);
+		@ctx.quadraticCurveTo(x, y, x + radius, y);
+		@ctx.closePath();
+		@ctx.lineWidth = 1
+		@ctx.strokeStyle = "#979797"
+		@ctx.stroke()
+
+		# Top and bottom buttons
+		@ctx.drawImage(@upImage, @canvas.width - @width, 0)
+		@ctx.drawImage(@downImage, @downRect.x, @downRect.y)
+
+	# Window resizing
+	resize: ->
+		# Set elements positions (align)
+		@knob.x = 
+		@upRect.x =
+		@downRect.x =
+			@canvas.width - @width
+		@downRect.y = @canvas.height - @knobMargin
+
+	_mouseUp: (e)->
+		$(window).unbind('mousemove touchmove')
+
+		cX = e.clientX || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageX
+		cY = e.clientY || (e.originalEvent.touches[0] || e.originalEvent.changedTouches[0]).pageY
+
+		# Scroll up click
+		if @upRect.containsPoint(cX, cY)
+			@_moveKnobY(@knob.y - 15)
+		# Scroll down click
+		else if @downRect.containsPoint(cX, cY)
+			@_moveKnobY(@knob.y + 15)
+
+
 window.WinScrollbar = WinScrollbar
+window.DefaultScrollbar = DefaultScrollbar
 window.Scrollbar = Scrollbar
 
 # Helper
