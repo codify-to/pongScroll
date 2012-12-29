@@ -17,7 +17,7 @@ class Pong
 		@ball = new createjs.Rectangle(20, 0, 30, 30)
 		@initialBallSpeed = 15
 		# Create the scrollbar
-		if BrowserDetect.OS == "Win"
+		if BrowserDetect.OS == "Windows"
 			@scroll = new WinScrollbar(@canvas)
 		else
 			@scroll = new Scrollbar(@canvas)
