@@ -100,9 +100,15 @@ footer{
 		position: absolute;
 		left: 49%;
 		bottom: 20px;
+		color: #666;
+
+		.plus {
+			color: #1bc1ff;
+			font-size: 10px
+		}
 	}
 
-	.plus{
+	.gplus{
 		float: right;
 		margin-left: 10px;
 		text-align: baseline;

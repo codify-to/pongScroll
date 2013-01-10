@@ -4,10 +4,10 @@ class Terminal
     #window.onerror = () -> true
     if(BrowserDetect.OS == "Mac")
       if(BrowserDetect.browser == "Chrome" || BrowserDetect.browser == "Safari")
-        $(".message").hide().text("⌘ ⌥ i").fadeIn()
+        $(".message").hide().html("⌘ <span class='plus'>+</span> ⌥ <span class='plus'>+</span> i").fadeIn()
         $(".message").delay(10000).fadeOut()
       else if(BrowserDetect.browser == "Firefox")
-        $(".message").hide().text("⌘ ⌥ k").fadeIn()
+        $(".message").hide().html("⌘ <span class='plus'>+</span> ⌥ <span class='plus'>+</span> k").fadeIn()
         $(".message").delay(10000).fadeOut()
 
     # Loads Hadouken sound
