@@ -13,8 +13,6 @@ class Pong
 		
 		# Creating the left paddle (that the game controls)
 		@gamePaddle = new createjs.Rectangle(20, window.innerHeight/2 - 90, 30, 180)
-		@gamePaddleImg = new Image()
-		@gamePaddleImg.src = "images/paddle.png"
 		# Game's ball
 		@ball = new createjs.Rectangle(20, 0, 42, 42)
 		@initialBallSpeed = 15
@@ -187,7 +185,12 @@ class Pong
 	# Draw the game
 	_draw: ()->
 		# Game paddle
-		@ctx.drawImage(@gamePaddleImg, @gamePaddle.x-4, @gamePaddle.y-4)
+		@ctx.fillStyle = "rgb(0,0,0)"
+		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y, @gamePaddle.width, @gamePaddle.height)
+		@ctx.globalAlpha = 0.2
+		@ctx.fillRect(@gamePaddle.x-4, @gamePaddle.y, @gamePaddle.width+8, @gamePaddle.height)
+		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y-4, @gamePaddle.width, @gamePaddle.height+8)
+		@ctx.globalAlpha = 1
 		# Ball
 		@ctx.fillStyle = @ballColor
 		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
