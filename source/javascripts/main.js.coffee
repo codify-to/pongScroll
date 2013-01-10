@@ -34,6 +34,7 @@ window.fbShare = () ->
 
   callback = (response)->
     console.log "Thanks for sharing"
-
+  
   FB.ui(obj, callback)
+  sound.play('click')
 
