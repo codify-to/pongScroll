@@ -47,24 +47,25 @@ class Pong
 		@ball.angle = 0
 
 		@playAgain(true)
-	playAgain: (silent)->
+	playAgain: (firstGameRound)->
 		# Reset score
 		@_setScore(0)
 		@firstHit = true
 		# Set ball position
 		@ball.x = @canvas.width - @ball.width - @scroll.width - 5
 		@ball.y = @scroll.knob.y + @scroll.knob.height/2
+		@ball.y += 30 if firstGameRound
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
 		# stop wintil user scrolls
 		@started = false
 		# Show tooltip
-		$("img.start").fadeIn()
+		$(".start").fadeIn()
 		$(".score").fadeOut(0)
 		# Hide hype animations
 		$("#intro_hype_container").fadeOut(300)
 
-		sound.play('click') if not silent
+		sound.play('click') if not firstGameRound
 
 		# Bind interaction events
 		# 
@@ -245,7 +246,7 @@ class Pong
 		# Check if we're starting the game
 		if not @started
 			# Show tooltip
-			$("img.start").fadeOut(300)
+			$(".start").fadeOut(300)
 			$(".score").delay(300).fadeIn()
 			@started = true
 			sound.play('scroll_to_start')
