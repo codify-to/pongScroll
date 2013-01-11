@@ -5,6 +5,7 @@ PADDLE_SPEED = 8
 
 class Pong
 	ballColor: "#1bc1ff"
+	_bgSoundPlaying: false
 	constructor: () ->
 		
 		# Get canvas
@@ -248,6 +249,10 @@ class Pong
 			$(".score").delay(300).fadeIn()
 			@started = true
 			sound.play('scroll_to_start')
+
+			# Bg sound
+			sound.play('bg', -1) if not @_bgSoundPlaying
+			@_bgSoundPlaying = true
 
 # Export
 window.Pong = Pong
