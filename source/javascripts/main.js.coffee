@@ -25,15 +25,16 @@ setInterval ->
 window.fbShare = () ->
   obj = {
     method: 'feed',
-    redirect_uri: 'http://pongscroll.me',
-    link: 'http://pongscroll.me',
+    redirect_uri: 'http://www.pongscroll.me',
+    link: 'http://www.pongscroll.me',
     name: 'PongScroll',
-    caption: 'Lets pong your scroll',
-    description: "I've ponged my scroll"
+    picture: 'http://www.pongscroll.me/images/share.jpg'
+    description: "Now, scroll is fun. Enjoy cabrones."
   }
 
   callback = (response)->
     console.log "Thanks for sharing"
-
+  
   FB.ui(obj, callback)
+  sound.play('click')
 

@@ -4,16 +4,11 @@ class Terminal
     #window.onerror = () -> true
     if(BrowserDetect.OS == "Mac")
       if(BrowserDetect.browser == "Chrome" || BrowserDetect.browser == "Safari")
-        $(".message").hide().text("⌘ ⌥ i").fadeIn()
+        $(".message").hide().html("⌘ <span class='plus'>+</span> ⌥ <span class='plus'>+</span> i").fadeIn()
         $(".message").delay(10000).fadeOut()
       else if(BrowserDetect.browser == "Firefox")
-        $(".message").hide().text("⌘ ⌥ k").fadeIn()
+        $(".message").hide().html("⌘ <span class='plus'>+</span> ⌥ <span class='plus'>+</span> k").fadeIn()
         $(".message").delay(10000).fadeOut()
-
-    # Loads Hadouken sound
-    queue = new createjs.PreloadJS();
-    queue.installPlugin(createjs.SoundJS) #Plug in SoundJS to handle browser-specific paths
-    queue.loadFile({src:"media/hadouken.mp3|media/hadouken.ogg", id:"hadouken"}, true)
 
     # Defines a clear function for the console
     if (console._commandLineAPI?)
@@ -59,7 +54,7 @@ class Terminal
       , 1000
 
   hadouken: () =>
-    createjs.SoundJS.play("hadouken")
+    sound.play("hadouken")
     console.log " _   _   ___ ______ _____ _   _ _   __ _____ _   _ \n
 | | | | / _ \\|  _  \\  _  | | | | | / /|  ___| \\ | |\n
 | |_| |/ /_\\ \\ | | | | | | | | | |/ / | |__ |  \\| |\n

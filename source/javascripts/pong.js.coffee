@@ -5,6 +5,7 @@ PADDLE_SPEED = 8
 
 class Pong
 	ballColor: "#1bc1ff"
+	_bgSoundPlaying: false
 	constructor: () ->
 		
 		# Get canvas
@@ -14,7 +15,7 @@ class Pong
 		# Creating the left paddle (that the game controls)
 		@gamePaddle = new createjs.Rectangle(20, window.innerHeight/2 - 90, 30, 180)
 		# Game's ball
-		@ball = new createjs.Rectangle(20, 0, 30, 30)
+		@ball = new createjs.Rectangle(20, 0, 42, 42)
 		@initialBallSpeed = 15
 		# Create the scrollbar
 		if BrowserDetect.OS == "Linux"
@@ -45,22 +46,26 @@ class Pong
 		# Reset ball direction
 		@ball.angle = 0
 
-		@playAgain()
-	playAgain: ()->
+		@playAgain(true)
+	playAgain: (firstGameRound)->
 		# Reset score
 		@_setScore(0)
+		@firstHit = true
 		# Set ball position
 		@ball.x = @canvas.width - @ball.width - @scroll.width - 5
 		@ball.y = @scroll.knob.y + @scroll.knob.height/2
+		@ball.y += 30 if firstGameRound
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
 		# stop wintil user scrolls
 		@started = false
 		# Show tooltip
-		$("img.start").fadeIn()
+		$(".start").fadeIn()
 		$(".score").fadeOut(0)
 		# Hide hype animations
 		$("#intro_hype_container").fadeOut(300)
+
+		sound.play('click') if not firstGameRound
 
 		# Bind interaction events
 		# 
@@ -109,7 +114,7 @@ class Pong
 	# Private
 	_updateGame: ->
 
-		# Check if it's time to follow the ball
+		# Check if it's time to make the paddle follow the ball
 		if @ball.x < @canvas.width/2
 			# 
 			# Move computer's paddle
@@ -135,21 +140,30 @@ class Pong
 		# Paddle Collision
 		# Computer Paddle
 		if lineIntersectsLine(ballP1, ballP2, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y}, {X: @gamePaddle.x+@gamePaddle.width, Y: @gamePaddle.y+@gamePaddle.height})
+			# Collided
 			a = @ball.height/2 + (@ball.y - @gamePaddle.y)
 			a = (a / @gamePaddle.height)*2 - 1
 			a = a * ANGLE_VARIATION
 			@ball.angle = a
+			sound.play('hit_enemy')
 			return
 		# User Paddle
 		else if lineIntersectsLine(ballP1, ballP2, {X: @scroll.knob.x-@scroll.knob.width, Y: @scroll.knob.y}, {X: @scroll.knob.x-@scroll.knob.width, Y: @scroll.knob.y+@scroll.knob.height})
+			# Collided
 			a = @ball.height/2 + (@ball.y - @scroll.knob.y)
 			a = (a / @scroll.knob.height)*2 - 1
 			a = Math.PI - (a * ANGLE_VARIATION)
 			@ball.angle = a
 			@ball.speed += 1
+			if @firstHit
+				@firstHit = false
+			else
+				sound.play('hit_me')
 			return
 		# Wall Collision
 		else if nextBall.y < 0 || nextBall.y > @canvas.height - nextBall.height
+			# Collided
+			sound.play('wall')
 			@ball.angle *= -1
 			return
 		else
@@ -173,11 +187,19 @@ class Pong
 	# Draw the game
 	_draw: ()->
 		# Game paddle
-		@ctx.fillStyle = "rgb(0, 0, 0)"
+		@ctx.fillStyle = "rgb(0,0,0)"
 		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y, @gamePaddle.width, @gamePaddle.height)
+		@ctx.globalAlpha = 0.2
+		@ctx.fillRect(@gamePaddle.x-4, @gamePaddle.y, @gamePaddle.width+8, @gamePaddle.height)
+		@ctx.fillRect(@gamePaddle.x, @gamePaddle.y-4, @gamePaddle.width, @gamePaddle.height+8)
+		@ctx.globalAlpha = 1
 		# Ball
 		@ctx.fillStyle = @ballColor
 		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
+		@ctx.globalAlpha = 0.2
+		@ctx.fillRect(@ball.x-4, @ball.y, @ball.width+8, @ball.height)
+		@ctx.fillRect(@ball.x, @ball.y-4, @ball.width, @ball.height+8)
+		@ctx.globalAlpha = 1
 		# Scroll bar
 		@scroll.draw()
 
@@ -192,12 +214,21 @@ class Pong
 		@ball.y = @gamePaddle.y + Math.random()*@gamePaddle.height
 		# Reset game speed
 		@ball.speed = @initialBallSpeed
+		@ctx.fillStyle = @ballColor
+		@ctx.fillRect(@ball.x, @ball.y, @ball.width, @ball.height)
+		@started = false
+		setTimeout =>
+			@started = true
+		, 400
 	_gameOver: ()->
 		return if not @started
 		@started = false
 
 		# Unbind interaction
 		@scroll.disable()
+
+		# Play game over sound
+		sound.play('lost')
 
 		# Show animation
 		$("#intro_hype_container").show()
@@ -215,9 +246,14 @@ class Pong
 		# Check if we're starting the game
 		if not @started
 			# Show tooltip
-			$("img.start").fadeOut(300)
+			$(".start").fadeOut(300)
 			$(".score").delay(300).fadeIn()
 			@started = true
+			sound.play('scroll_to_start')
+
+			# Bg sound
+			sound.play('bg', -1) if not @_bgSoundPlaying
+			@_bgSoundPlaying = true
 
 # Export
 window.Pong = Pong
