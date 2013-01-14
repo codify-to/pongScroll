@@ -29,7 +29,7 @@ window.fbShare = () ->
     link: 'http://www.pongscroll.me',
     name: 'PongScroll',
     picture: 'http://www.pongscroll.me/images/share.jpg'
-    description: "Now, scroll is fun. Enjoy cabrones."
+    description: "Now, scrolling is fun. Enjoy cabrones."
   }
 
   callback = (response)->
